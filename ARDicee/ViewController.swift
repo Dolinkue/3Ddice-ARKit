@@ -10,6 +10,8 @@ import SceneKit
 import ARKit
 
 class ViewController: UIViewController, ARSCNViewDelegate {
+    
+    var diceArray = [SCNNode]()
 
     @IBOutlet var sceneView: ARSCNView!
     
@@ -97,28 +99,71 @@ class ViewController: UIViewController, ARSCNViewDelegate {
                 dicenote?.position = SCNVector3(hitResult.worldTransform.columns.3.x, hitResult.worldTransform.columns.3.y + (dicenote?.boundingSphere.radius)!, hitResult.worldTransform.columns.3.z)
                 
                 
+                //agrego los dados que creo al arrey
+                diceArray.append(dicenote!)
+                
+                
                 sceneView.scene.rootNode.addChildNode(dicenote!)
                 
                 
-                // creamos los mov random tanto en x como en z
-                let randomX = Float(arc4random_uniform(4) + 1) * (Float.pi/2)
-                
-                let randomZ = Float(arc4random_uniform(4) + 1) * (Float.pi/2)
-                
-                
-                // aca damos la animacion para la rotacion con los datos que cargamos arriba
-                dicenote?.runAction(
-                    SCNAction.rotateBy(x: CGFloat(randomX * 5), y: 0, z: CGFloat(randomZ * 5), duration: 0.5)
-                    
-                
-                )
+                roll(dicenote!)
                 
             }
             
             
-                }
+        }
       }
     
+    func rollAll() {
+        
+        if !diceArray.isEmpty {
+            
+            for dice in diceArray {
+                roll(dice)
+            }
+        }
+    }
+    
+        func roll(_ dice: SCNNode) {
+            
+            // creamos los mov random tanto en x como en z
+            let randomX = Float(arc4random_uniform(4) + 1) * (Float.pi/2)
+            
+            let randomZ = Float(arc4random_uniform(4) + 1) * (Float.pi/2)
+            
+            
+            // aca damos la animacion para la rotacion con los datos que cargamos arriba
+            dice.runAction(
+                SCNAction.rotateBy(x: CGFloat(randomX * 5), y: 0, z: CGFloat(randomZ * 5), duration: 0.5)
+                
+            
+            )
+            
+        }
+        
+    
+    @IBAction func rollAgain(_ sender: UIBarButtonItem) {
+        
+        rollAll()
+        
+    }
+    
+    @IBAction func removeDice(_ sender: UIBarButtonItem) {
+        
+        if !diceArray.isEmpty {
+            
+            for dice in diceArray {
+                dice.removeFromParentNode()
+            }
+        }
+        
+    }
+    
+    
+    
+    override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        rollAll()
+    }
     
     
     //delegate metodo para decir que identifique la superficie horizontal
